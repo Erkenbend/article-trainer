@@ -1,0 +1,50 @@
+name: CI Pipeline
+run-name: ${{ github.actor }} is deploying Article Trainer ⬆️⬇️
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  Build_and_Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node/NPM
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Install infrastructure dependencies
+        run: |
+          cd infrastructure && npm install
+
+      - name: Lint
+        run: |
+          npm run lint
+
+      - name: Build application
+        run: |
+          CI=false npm run build
+
+      - name: CDK diff
+        run: |
+          cd infrastructure && npx cdk diff
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
+
+      - name: CDK deploy
+        run: |
+          cd infrastructure && npx cdk deploy --require-approval never "ArticleTrainerInfrastructureStack"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
