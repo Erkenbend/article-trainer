@@ -1,7 +1,16 @@
 # DER oder DAS
 
-TODO
+Trainiere schwierige Substantive interaktiv → https://der-oder-das.ninasworkshop.de
 
+## Commands
+
+Get started: `npm install`
+
+Run dev server: `npm run dev`
+
+Lint project: `npm run lint`
+
+Build production site: `npm run build`
 
 # Artwork sources
 
