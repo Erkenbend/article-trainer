@@ -1,0 +1,42 @@
+#root {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.build-timestamp {
+    position: fixed;
+    bottom: 2em;
+    right: 3em;
+    padding-left: 1em;
+    padding-right: 1em;
+    opacity: 0.4;
+}
+
+.challenge-word {
+    font-size: 8em;
+}
+
+.response-buttons {
+    display: grid;
+    grid-auto-flow: column;
+    grid-column-gap: 3em;
+}
+
+.response-button {
+    border-radius: 80px;
+    font-size: 3em;
+}
+
+.last-answer-status-correct {
+    padding-top: 2em;
+    font-size: 3em;
+    color: darkgreen;
+}
+
+.last-answer-status-incorrect {
+    padding-top: 2em;
+    font-size: 3em;
+    color: darkred;
+}
