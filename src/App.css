@@ -15,28 +15,27 @@
 }
 
 .challenge-word {
-    font-size: 8em;
+    font-size: 5em;
 }
 
-.response-buttons {
-    display: grid;
-    grid-auto-flow: column;
-    grid-column-gap: 3em;
+.response-button + .response-button {
+    margin-left: 0.5em;
 }
 
 .response-button {
     border-radius: 80px;
-    font-size: 3em;
+    font-size: 2em;
+}
+
+.last-answer {
+    padding-top: 2em;
+    font-size: 2em;
 }
 
 .last-answer-status-correct {
-    padding-top: 2em;
-    font-size: 3em;
     color: darkgreen;
 }
 
 .last-answer-status-incorrect {
-    padding-top: 2em;
-    font-size: 3em;
     color: darkred;
 }

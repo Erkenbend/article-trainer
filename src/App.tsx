@@ -8,7 +8,7 @@ const LOCALE = "en-DE";
 function LastAnswerDiv(props: { lastAnswerCorrect: boolean | null }) {
     const {lastAnswerCorrect} = props
     if (lastAnswerCorrect == null) {
-        return null
+        return <div>&nbsp;</div>
     }
     if (lastAnswerCorrect) {
         return <div className="last-answer-status-correct">
@@ -61,7 +61,9 @@ function App() {
                 </button>
             </div>
 
-            <LastAnswerDiv lastAnswerCorrect={lastAnswerCorrect}/>
+            <div className="last-answer">
+                <LastAnswerDiv lastAnswerCorrect={lastAnswerCorrect}/>
+            </div>
 
             <div className="build-timestamp">
                 Version: {new Date(BUILD_TIMESTAMP).toLocaleString(LOCALE)}
