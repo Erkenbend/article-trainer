@@ -31,6 +31,14 @@ const wordsWithDer = [
     "Magnet",
     "Fleck",
     "Rachen",
+    "Aspekt",
+    "Kürbis",
+    "Abend",
+    "Streak",
+    "Gürtel",
+    "Geschmack",
+    "Planet",
+    "Typ",
 ]
 
 const wordsWithDas = [
@@ -49,6 +57,14 @@ const wordsWithDas = [
     "Volumen",
     "Stroh",
     "Schaf",
+    "Aua",
+    "Pulver",
+    "Protokoll",
+    "Maß",
+    "Klo",
+    "Gerät",
+    "Prinzip",
+    "Verfahren",
 ]
 
 export const SOLUTIONS = computeSolutions();
