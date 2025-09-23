@@ -40,6 +40,7 @@ const wordLists = new Map<Article, string[]>([
         "Geschmack",
         "Planet",
         "Typ",
+        "Adler",
     ]],
     [Article.DAS, [
         "Geschlecht",
@@ -50,7 +51,7 @@ const wordLists = new Map<Article, string[]>([
         "Monster",
         "Gespenst",
         "Gespinst",
-        "Gummi",
+        "Verfahren",
         "Knie",
         "Dorf",
         "Kabel",
@@ -64,7 +65,8 @@ const wordLists = new Map<Article, string[]>([
         "Klo",
         "Gerät",
         "Prinzip",
-        "Verfahren",
+        "Gesetz",
+        "Gratin",
     ]]
 ]);
 
