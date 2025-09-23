@@ -71,7 +71,7 @@ function App() {
                 </div>
                 <div className="github-logo">
                     <a href="https://github.com/Erkenbend/article-trainer">
-                        <img src="/github-mark-white.svg" alt="GitHub Logo" width="40px"/>
+                        <img src="/github-mark-white.svg" alt="GitHub Logo" width="30px"/>
                     </a>
                 </div>
             </div>
