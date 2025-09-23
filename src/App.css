@@ -20,6 +20,20 @@
     opacity: 0.4;
 }
 
+.streak-indicator {
+    padding-bottom: 3em;
+}
+
+.current-streak {
+    text-align: left;
+    float: left;
+}
+
+.best-streak {
+    float: right;
+    text-align: right;
+}
+
 .challenge-word {
     font-size: xxx-large;
 }
