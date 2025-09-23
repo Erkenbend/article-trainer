@@ -65,7 +65,7 @@ function App() {
 
             <div className="footer">
                 <div className="build-timestamp">
-                    Build timestamp: {new Date(BUILD_TIMESTAMP).toLocaleString(LOCALE)}
+                    Version: {new Date(BUILD_TIMESTAMP).toLocaleString(LOCALE)}
                 </div>
                 <div className="github-logo">
                     <a href="https://github.com/Erkenbend/article-trainer">
