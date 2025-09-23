@@ -65,8 +65,15 @@ function App() {
                 <LastAnswerDiv lastAnswerCorrect={lastAnswerCorrect}/>
             </div>
 
-            <div className="build-timestamp">
-                Version: {new Date(BUILD_TIMESTAMP).toLocaleString(LOCALE)}
+            <div className="footer">
+                <div className="build-timestamp">
+                    Build timestamp: {new Date(BUILD_TIMESTAMP).toLocaleString(LOCALE)}
+                </div>
+                <div className="github-logo">
+                    <a href="https://github.com/Erkenbend/article-trainer">
+                        <img src="/github-mark-white.svg" alt="GitHub Logo" width="40px"/>
+                    </a>
+                </div>
             </div>
         </>
     )
