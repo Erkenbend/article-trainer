@@ -1,7 +1,7 @@
 import {useState} from 'react'
 
 import './App.css'
-import {Article, SOLUTIONS} from "./word-list.ts";
+import {Article, getRandomWord, isCorrect} from "./word-list.ts";
 
 const LOCALE = "en-DE";
 
@@ -28,15 +28,13 @@ function App() {
     function chooseNewChallengeWord(currentWord: string): string {
         let newChallengeWord = undefined
         do {
-            newChallengeWord = Array.from(SOLUTIONS.keys())[Math.floor(Math.random() * SOLUTIONS.size)]
+            newChallengeWord = getRandomWord()
         } while (newChallengeWord === currentWord)
         return newChallengeWord
     }
 
     function handleResponseButtonClicked(article: Article) {
-        setLastAnswerCorrect(() => {
-            return SOLUTIONS.get(challengeWord) == article
-        })
+        setLastAnswerCorrect(() => isCorrect(article, challengeWord))
         setChallengeWord(c => chooseNewChallengeWord(c))
     }
 
