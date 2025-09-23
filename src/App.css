@@ -28,6 +28,10 @@
     margin-left: 0.5em;
 }
 
+.response-buttons {
+    padding-top: 2em;
+}
+
 .response-button {
     border-radius: 80px;
     font-size: 2em;
