@@ -26,11 +26,13 @@
 
 .current-streak {
     text-align: left;
-    float: left;
 }
 
 .best-streak {
-    float: right;
+    text-align: right;
+}
+
+.best-streak-time {
     text-align: right;
 }
 
@@ -62,4 +64,12 @@
 
 .last-answer-status-incorrect {
     color: darkred;
+}
+
+.reset-section {
+    padding-top: 2em;
+}
+
+.reset-button {
+    border-radius: 20px;
 }

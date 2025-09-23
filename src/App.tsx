@@ -7,7 +7,9 @@ const LOCALE = "en-DE";
 
 interface Score {
     readonly currentStreak: number;
+    readonly startTimeCurrentStreak: number;
     readonly bestStreak: number;
+    readonly bestStreakTimePerWord: number;
 }
 
 function LastAnswerDiv(props: { lastAnswerCorrect: boolean | null }) {
@@ -29,7 +31,12 @@ function App() {
 
     const [challengeWord, setChallengeWord] = useState<string>(chooseNewChallengeWord(""));
     const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
-    const [score, updateScore] = useState<Score>({currentStreak: 0, bestStreak: 0});
+    const [score, updateScore] = useState<Score>({
+        currentStreak: 0,
+        startTimeCurrentStreak: performance.now(),
+        bestStreak: 0,
+        bestStreakTimePerWord: 0
+    });
 
     function chooseNewChallengeWord(currentWord: string): string {
         let newChallengeWord = undefined
@@ -44,26 +51,48 @@ function App() {
         setLastAnswerCorrect(() => correctAnswer)
         setChallengeWord(c => chooseNewChallengeWord(c))
         updateScore(s => {
-            return correctAnswer ? {
-                currentStreak: s.currentStreak + 1,
-                bestStreak: s.bestStreak
-            } : {
+            if (correctAnswer) {
+                return {
+                    ...s,
+                    currentStreak: s.currentStreak + 1,
+                    bestStreak: s.bestStreak
+                }
+            }
+            return {
                 currentStreak: 0,
-                bestStreak: Math.max(s.currentStreak, s.bestStreak)
+                startTimeCurrentStreak: performance.now(),
+                bestStreak: Math.max(s.currentStreak, s.bestStreak),
+                bestStreakTimePerWord: s.currentStreak > s.bestStreak ? (performance.now() - s.startTimeCurrentStreak) / s.currentStreak : s.bestStreakTimePerWord
             }
         })
     }
 
+    function resetGame() {
+        setLastAnswerCorrect(null)
+        setChallengeWord(c => chooseNewChallengeWord(c))
+        updateScore({...score, currentStreak: 0, startTimeCurrentStreak: performance.now()})
+    }
+
     return (
         <>
-            <div className="streak-indicator">
-                <div className="current-streak">
-                    Aktueller Streak: {score.currentStreak}
-                </div>
-                <div className="best-streak">
-                    Bester Streak: {score.bestStreak}
-                </div>
-            </div>
+            <table className="streak-indicator">
+                <tbody>
+                <tr>
+                    <td className="current-streak">
+                        Aktueller Streak: {score.currentStreak}
+                    </td>
+                    <td className="best-streak">
+                        Bester Streak: {score.bestStreak}
+                    </td>
+                </tr>
+                <tr>
+                    <td/>
+                    <td className="best-streak-time">
+                        Zeit pro Wort: {(score.bestStreakTimePerWord / 1000).toFixed(2)}s
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
             <div className="challenge-word">
                 {challengeWord}
@@ -86,6 +115,14 @@ function App() {
 
             <div className="last-answer">
                 <LastAnswerDiv lastAnswerCorrect={lastAnswerCorrect}/>
+            </div>
+
+            <div className="reset-section">
+                <button type="button" className="reset-button" onClick={() => {
+                    resetGame()
+                }}>
+                    Zurücksetzen
+                </button>
             </div>
 
             <div className="footer">
