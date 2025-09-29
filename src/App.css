@@ -22,18 +22,17 @@
 
 .streak-indicator {
     padding-bottom: 3em;
+    display: inline-block;
 }
 
 .current-streak {
     text-align: left;
+    min-width: 8rem;
 }
 
 .best-streak {
     text-align: right;
-}
-
-.best-streak-time {
-    text-align: right;
+    min-width: 8rem;
 }
 
 .challenge-word {

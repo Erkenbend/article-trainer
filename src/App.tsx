@@ -7,9 +7,57 @@ const LOCALE = "en-DE";
 
 interface Score {
     readonly currentStreak: number;
+    readonly currentStreakTimePerWord: number | null;
     readonly startTimeCurrentStreak: number;
     readonly bestStreak: number;
-    readonly bestStreakTimePerWord: number;
+    readonly bestStreakTimePerWord: number | null;
+}
+
+function streakBeaten(score: Score): boolean {
+    if (score.currentStreak > score.bestStreak) {
+        return true;
+    }
+    if (score.currentStreak < score.bestStreak) {
+        return false;
+    }
+    if (score.currentStreakTimePerWord === null || score.bestStreakTimePerWord === null) {
+        return false;
+    }
+    return score.currentStreakTimePerWord < score.bestStreakTimePerWord;
+}
+
+function displayAsString(duration: number | null): string {
+    return ((duration ?? 0) / 1000).toFixed(2)
+}
+
+function StreakIndicatorTable(props: { score: Score }) {
+    const {score} = props
+    return <table className="streak-indicator">
+        <thead>
+        <tr>
+            <th className="current-streak">Aktuell</th>
+            <th className="best-streak">Rekord</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td className="current-streak">
+                Streak: {score.currentStreak}
+            </td>
+            <td className="best-streak">
+                Streak: {score.bestStreak}
+            </td>
+        </tr>
+        <tr>
+            <td className="current-streak">
+                ({displayAsString(score.currentStreakTimePerWord)}s/Wort)
+            </td>
+            <td className="best-streak">
+                ({displayAsString(score.bestStreakTimePerWord)}s/Wort)
+            </td>
+        </tr>
+        </tbody>
+    </table>
 }
 
 function LastAnswerDiv(props: { lastAnswerCorrect: boolean | null }) {
@@ -33,9 +81,10 @@ function App() {
     const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
     const [score, updateScore] = useState<Score>({
         currentStreak: 0,
+        currentStreakTimePerWord: null,
         startTimeCurrentStreak: performance.now(),
         bestStreak: 0,
-        bestStreakTimePerWord: 0
+        bestStreakTimePerWord: null
     });
 
     function chooseNewChallengeWord(currentWord: string): string {
@@ -55,14 +104,15 @@ function App() {
                 return {
                     ...s,
                     currentStreak: s.currentStreak + 1,
-                    bestStreak: s.bestStreak
+                    currentStreakTimePerWord: (performance.now() - s.startTimeCurrentStreak) / (s.currentStreak + 1)
                 }
             }
             return {
                 currentStreak: 0,
+                currentStreakTimePerWord: null,
                 startTimeCurrentStreak: performance.now(),
-                bestStreak: Math.max(s.currentStreak, s.bestStreak),
-                bestStreakTimePerWord: s.currentStreak > s.bestStreak ? (performance.now() - s.startTimeCurrentStreak) / s.currentStreak : s.bestStreakTimePerWord
+                bestStreak: streakBeaten(s) ? s.currentStreak : s.bestStreak,
+                bestStreakTimePerWord: streakBeaten(s) ? s.currentStreakTimePerWord : s.bestStreakTimePerWord
             }
         })
     }
@@ -70,29 +120,17 @@ function App() {
     function resetGame() {
         setLastAnswerCorrect(null)
         setChallengeWord(c => chooseNewChallengeWord(c))
-        updateScore({...score, currentStreak: 0, startTimeCurrentStreak: performance.now()})
+        updateScore({
+            ...score,
+            currentStreak: 0,
+            currentStreakTimePerWord: null,
+            startTimeCurrentStreak: performance.now()
+        })
     }
 
     return (
         <>
-            <table className="streak-indicator">
-                <tbody>
-                <tr>
-                    <td className="current-streak">
-                        Aktueller Streak: {score.currentStreak}
-                    </td>
-                    <td className="best-streak">
-                        Bester Streak: {score.bestStreak}
-                    </td>
-                </tr>
-                <tr>
-                    <td/>
-                    <td className="best-streak-time">
-                        Zeit pro Wort: {(score.bestStreakTimePerWord / 1000).toFixed(2)}s
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+            <StreakIndicatorTable score={score}/>
 
             <div className="challenge-word">
                 {challengeWord}
