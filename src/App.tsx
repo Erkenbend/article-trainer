@@ -30,6 +30,14 @@ function displayAsString(duration: number | null): string {
     return ((duration ?? 0) / 1000).toFixed(2)
 }
 
+function chooseNewChallengeWord(currentWord: string): string {
+    let newChallengeWord = undefined
+    do {
+        newChallengeWord = getRandomWord()
+    } while (newChallengeWord === currentWord)
+    return newChallengeWord
+}
+
 function StreakIndicatorTable(props: { score: Score }) {
     const {score} = props
     return <table className="streak-indicator">
@@ -63,15 +71,32 @@ function StreakIndicatorTable(props: { score: Score }) {
 function LastAnswerDiv(props: { lastAnswerCorrect: boolean | null }) {
     const {lastAnswerCorrect} = props
     if (lastAnswerCorrect == null) {
-        return <div>&nbsp;</div>
+        return <div className="last-answer">&nbsp;</div>
     }
     if (lastAnswerCorrect) {
-        return <div className="last-answer-status-correct">
-            KORREKT!
+        return <div className="last-answer">
+            <div className="last-answer-status-correct">
+                KORREKT!
+            </div>
         </div>
     }
-    return <div className="last-answer-status-incorrect">
-        INKORREKT!
+    return <div className="last-answer">
+        <div className="last-answer-status-incorrect">
+            INKORREKT!
+        </div>
+    </div>
+}
+
+function Footer() {
+    return <div className="footer">
+        <div className="build-timestamp">
+            Version: {new Date(BUILD_TIMESTAMP).toLocaleString(LOCALE)}
+        </div>
+        <div className="github-logo">
+            <a href="https://github.com/Erkenbend/article-trainer">
+                <img src="/github-mark-white.svg" alt="GitHub Logo" width="30px"/>
+            </a>
+        </div>
     </div>
 }
 
@@ -86,14 +111,6 @@ function App() {
         bestStreak: 0,
         bestStreakTimePerWord: null
     });
-
-    function chooseNewChallengeWord(currentWord: string): string {
-        let newChallengeWord = undefined
-        do {
-            newChallengeWord = getRandomWord()
-        } while (newChallengeWord === currentWord)
-        return newChallengeWord
-    }
 
     function handleResponseButtonClicked(article: Article) {
         const correctAnswer = isCorrect(article, challengeWord);
@@ -139,40 +156,25 @@ function App() {
             <div className="response-buttons">
                 <button type="button" className="response-button"
                         onClick={() => {
-                            handleResponseButtonClicked(Article.DER);
+                            handleResponseButtonClicked(Article.DER)
                         }}>
                     DER
                 </button>
                 <button type="button" className="response-button"
                         onClick={() => {
-                            handleResponseButtonClicked(Article.DAS);
+                            handleResponseButtonClicked(Article.DAS)
                         }}>
                     DAS
                 </button>
             </div>
 
-            <div className="last-answer">
-                <LastAnswerDiv lastAnswerCorrect={lastAnswerCorrect}/>
-            </div>
+            <LastAnswerDiv lastAnswerCorrect={lastAnswerCorrect}/>
 
             <div className="reset-section">
-                <button type="button" className="reset-button" onClick={() => {
-                    resetGame()
-                }}>
-                    Zurücksetzen
-                </button>
+                <button type="button" className="reset-button" onClick={resetGame}>Zurücksetzen</button>
             </div>
 
-            <div className="footer">
-                <div className="build-timestamp">
-                    Version: {new Date(BUILD_TIMESTAMP).toLocaleString(LOCALE)}
-                </div>
-                <div className="github-logo">
-                    <a href="https://github.com/Erkenbend/article-trainer">
-                        <img src="/github-mark-white.svg" alt="GitHub Logo" width="30px"/>
-                    </a>
-                </div>
-            </div>
+            <Footer/>
         </>
     )
 }
