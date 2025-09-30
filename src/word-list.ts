@@ -4,11 +4,18 @@ export enum Article {
 }
 
 export enum Difficulty {
-    ADRIEN,
-    EASY,
-    INTERMEDIATE,
-    HARD
+    ADRIEN = "Adrien",
+    EASY = "Anfänger (A1/A2)",
+    INTERMEDIATE = "Fortgeschritten (B1/B2)",
+    HARD = "Experte (C1/C2)",
 }
+
+// export function getEnumKeys<
+//     T extends string,
+//     TEnumValue extends string | number,
+// >(enumVariable: { [key in T]: TEnumValue }) {
+//     return Object.keys(enumVariable) as Array<T>;
+// }
 
 // TEMPLATE FOR WORD MAPS
 // const templateWordMap = new Map<Article, string[]>([
@@ -5815,8 +5822,8 @@ const wordMaps = new Map<Difficulty, Map<Article, string[]>>([
 
 // TODO: allow user to change between different word maps
 
-export function getRandomWord(): string {
-    const wordMap = wordMaps.get(Difficulty.ADRIEN);
+export function getRandomWord(difficulty: Difficulty): string {
+    const wordMap = wordMaps.get(difficulty);
     if (!wordMap) {
         console.warn("Word map not found!")
         return "";
@@ -5829,8 +5836,8 @@ export function getRandomWord(): string {
     return wordList[Math.floor(Math.random() * wordList.length)];
 }
 
-export function isCorrect(guessedArticle: Article, challengeWord: string): boolean {
-    const wordMap = wordMaps.get(Difficulty.ADRIEN);
+export function isCorrect(guessedArticle: Article, challengeWord: string, difficulty: Difficulty): boolean {
+    const wordMap = wordMaps.get(difficulty);
     if (!wordMap) {
         console.warn("Word map not found!")
         return false;

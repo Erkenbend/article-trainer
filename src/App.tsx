@@ -1,7 +1,7 @@
 import {useState} from 'react'
 
 import './App.css'
-import {Article, getRandomWord, isCorrect} from "./word-list.ts";
+import {Article, Difficulty, getRandomWord, isCorrect} from "./word-list.ts";
 
 const LOCALE = "en-DE";
 
@@ -11,6 +11,11 @@ interface Score {
     readonly startTimeCurrentStreak: number;
     readonly bestStreak: number;
     readonly bestStreakTimePerWord: number | null;
+}
+
+interface Challenge {
+    readonly currentWord: string;
+    readonly selectedDifficulty: Difficulty;
 }
 
 function streakBeaten(score: Score): boolean {
@@ -30,10 +35,10 @@ function displayAsString(duration: number | null): string {
     return duration === null ? '-' : (duration / 1000).toFixed(2);
 }
 
-function chooseNewChallengeWord(currentWord: string): string {
+function chooseNewChallengeWord(currentWord: string, difficulty: Difficulty): string {
     let newChallengeWord = undefined
     do {
-        newChallengeWord = getRandomWord()
+        newChallengeWord = getRandomWord(difficulty)
     } while (newChallengeWord === currentWord)
     return newChallengeWord
 }
@@ -102,8 +107,8 @@ function Footer() {
 
 function App() {
 
-    const [challengeWord, setChallengeWord] = useState<string>(chooseNewChallengeWord(""));
     const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
+    // TODO: score per difficulty
     const [score, updateScore] = useState<Score>({
         currentStreak: 0,
         currentStreakTimePerWord: null,
@@ -111,11 +116,18 @@ function App() {
         bestStreak: 0,
         bestStreakTimePerWord: null
     });
+    const [challenge, updateChallenge] = useState<Challenge>({
+        currentWord: chooseNewChallengeWord("", Difficulty.ADRIEN),
+        selectedDifficulty: Difficulty.ADRIEN
+    });
 
     function handleResponseButtonClicked(article: Article) {
-        const correctAnswer = isCorrect(article, challengeWord);
+        const correctAnswer = isCorrect(article, challenge.currentWord, challenge.selectedDifficulty);
         setLastAnswerCorrect(() => correctAnswer)
-        setChallengeWord(c => chooseNewChallengeWord(c))
+        updateChallenge(c => ({
+            ...c,
+            currentWord: chooseNewChallengeWord(c.currentWord, c.selectedDifficulty)
+        }))
         updateScore(s => {
             if (correctAnswer) {
                 // only start computing streak time on second correct answer
@@ -145,7 +157,10 @@ function App() {
 
     function resetGame() {
         setLastAnswerCorrect(null)
-        setChallengeWord(c => chooseNewChallengeWord(c))
+        updateChallenge(c => ({
+            ...c,
+            currentWord: chooseNewChallengeWord(c.currentWord, c.selectedDifficulty)
+        }))
         updateScore({
             ...score,
             currentStreak: 0,
@@ -159,7 +174,7 @@ function App() {
             <StreakIndicatorTable score={score}/>
 
             <div className="challenge-word">
-                {challengeWord}
+                {challenge.currentWord}
             </div>
 
             <div className="response-buttons">
@@ -181,6 +196,36 @@ function App() {
 
             <div className="reset-section">
                 <button type="button" className="reset-button" onClick={resetGame}>Zurücksetzen</button>
+            </div>
+
+            {/* TODO: extract to separate component */}
+            <div className="difficulty-selection">
+                <br/>
+                <label>Wortliste:&nbsp;&nbsp;</label>
+                <select
+                    className="difficulty-selector"
+                    value={challenge.selectedDifficulty}
+                    onChange={e => {
+                        updateChallenge(c => ({
+                            ...c,
+                            selectedDifficulty: e.target.value as Difficulty
+                        }))
+                        resetGame()
+                    }}
+                >
+                    <option value={Difficulty.ADRIEN}>{Difficulty.ADRIEN}</option>
+                    <option value={Difficulty.EASY}>{Difficulty.EASY}</option>
+                    <option value={Difficulty.INTERMEDIATE}>{Difficulty.INTERMEDIATE}</option>
+                    <option value={Difficulty.HARD}>{Difficulty.HARD}</option>
+
+                    {/* TODO later: make the select block dynamic from enum values */}
+                    {/*{getEnumKeys(Difficulty).map((key, index) => (*/}
+                    {/*    // eslint-disable-next-line react-x/no-array-index-key*/}
+                    {/*    <option key={index} value={key}>*/}
+                    {/*        {Difficulty[key]}*/}
+                    {/*    </option>*/}
+                    {/*))}*/}
+                </select>
             </div>
 
             <Footer/>

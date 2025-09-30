@@ -72,3 +72,11 @@
 .reset-button {
     border-radius: 20px;
 }
+
+.difficulty-selection {
+    padding-top: 1em;
+}
+
+.difficulty-selector {
+    border: none;
+}
