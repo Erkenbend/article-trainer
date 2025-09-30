@@ -27,7 +27,7 @@ function streakBeaten(score: Score): boolean {
 }
 
 function displayAsString(duration: number | null): string {
-    return ((duration ?? 0) / 1000).toFixed(2)
+    return duration === null ? '-' : (duration / 1000).toFixed(2);
 }
 
 function chooseNewChallengeWord(currentWord: string): string {
@@ -58,10 +58,10 @@ function StreakIndicatorTable(props: { score: Score }) {
         </tr>
         <tr>
             <td className="current-streak">
-                ({displayAsString(score.currentStreakTimePerWord)}s/Wort)
+                ({displayAsString(score.currentStreakTimePerWord)} s/Wort)
             </td>
             <td className="best-streak">
-                ({displayAsString(score.bestStreakTimePerWord)}s/Wort)
+                ({displayAsString(score.bestStreakTimePerWord)} s/Wort)
             </td>
         </tr>
         </tbody>
@@ -120,8 +120,9 @@ function App() {
             if (correctAnswer) {
                 return {
                     ...s,
+                    startTimeCurrentStreak: s.currentStreak == 0 ? performance.now() : s.startTimeCurrentStreak,
                     currentStreak: s.currentStreak + 1,
-                    currentStreakTimePerWord: (performance.now() - s.startTimeCurrentStreak) / (s.currentStreak + 1)
+                    currentStreakTimePerWord: s.currentStreak == 0 ? s.currentStreakTimePerWord : (performance.now() - s.startTimeCurrentStreak) / s.currentStreak
                 }
             }
             return {
