@@ -118,13 +118,21 @@ function App() {
         setChallengeWord(c => chooseNewChallengeWord(c))
         updateScore(s => {
             if (correctAnswer) {
-                return {
-                    ...s,
-                    startTimeCurrentStreak: s.currentStreak == 0 ? performance.now() : s.startTimeCurrentStreak,
-                    currentStreak: s.currentStreak + 1,
-                    currentStreakTimePerWord: s.currentStreak == 0 ? s.currentStreakTimePerWord : (performance.now() - s.startTimeCurrentStreak) / s.currentStreak
-                }
+                // only start computing streak time on second correct answer
+                return s.currentStreak == 0 ?
+                    {
+                        ...s,
+                        currentStreak: s.currentStreak + 1,
+                        startTimeCurrentStreak: performance.now()
+                    } :
+                    {
+                        ...s,
+                        currentStreak: s.currentStreak + 1,
+                        currentStreakTimePerWord: (performance.now() - s.startTimeCurrentStreak) / s.currentStreak
+                    }
             }
+
+            // save streak and reset on wrong answer
             return {
                 currentStreak: 0,
                 currentStreakTimePerWord: null,
