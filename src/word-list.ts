@@ -3,12 +3,43 @@ export enum Article {
     DAS,
 }
 
-export enum Difficulty {
-    ADRIEN = "Adrien",
-    EASY = "Anfänger (A1/A2)",
-    INTERMEDIATE = "Fortgeschritten (B1/B2)",
-    HARD = "Experte (C1/C2)",
+// export enum Difficulty {
+//     ADRIEN = "Adrien",
+//     EASY = "Anfänger (A1/A2)",
+//     INTERMEDIATE = "Fortgeschritten (B1/B2)",
+//     HARD = "Experte (C1/C2)",
+// }
+
+interface Difficulty {
+    translation: string;
+    wordMap: Map<Article, string[]>;
 }
+
+// export enum Difficulty {
+//     ADRIEN,
+//     EASY,
+//     INTERMEDIATE,
+//     HARD,
+// }
+
+// const difficultyTranslation = new Map<Difficulty, string>([
+//     [Difficulty.ADRIEN, "Adrien"],
+//     [Difficulty.EASY, "Anfänger (A1/A2)"],
+//     [Difficulty.INTERMEDIATE, "Fortgeschritten (B1/B2)"],
+//     [Difficulty.HARD, "Experte (C1/C2)"],
+// ]);
+
+export const translateDifficulty = (difficultyKey: DifficultyKey): string => wordMaps.get(difficultyKey)?.translation ?? "";
+
+// export const Difficulty = {
+//     ADRIEN: "Adrien",
+//     EASY: "Anfänger (A1/A2)",
+//     INTERMEDIATE: "Fortgeschritten (B1/B2)",
+//     HARD: "Experte (C1/C2)",
+// } as const;
+//
+// export type TDifficulty = typeof Difficulty[keyof typeof Difficulty];
+
 
 // export function getEnumKeys<
 //     T extends string,
@@ -5813,22 +5844,24 @@ const hardWordMap = new Map<Article, string[]>([
     ]]
 ]);
 
-const wordMaps = new Map<Difficulty, Map<Article, string[]>>([
-    [Difficulty.ADRIEN, adrienWordMap],
-    [Difficulty.EASY, easyWordMap],
-    [Difficulty.INTERMEDIATE, intermediateWordMap],
-    [Difficulty.HARD, hardWordMap],
+// const difficultyKeys = Array.from(wordMaps.keys()) as const;
+export const supportedDifficulties = ["ADRIEN", "EASY", "INTERMEDIATE", "HARD"] as const;
+export type DifficultyKey = typeof supportedDifficulties[number];
+
+const wordMaps = new Map<DifficultyKey, Difficulty>([
+    ["ADRIEN", { translation: "Adrien", wordMap: adrienWordMap}],
+    ["EASY", { translation: "Anfänger (A1/A2)", wordMap: easyWordMap}],
+    ["INTERMEDIATE", { translation: "Fortgeschritten (B1/B2)", wordMap: intermediateWordMap}],
+    ["HARD", { translation: "Experte (C1/C2)", wordMap: hardWordMap}],
 ])
 
-// TODO: allow user to change between different word maps
-
-export function getRandomWord(difficulty: Difficulty): string {
-    const wordMap = wordMaps.get(difficulty);
-    if (!wordMap) {
-        console.warn("Word map not found!")
+export function getRandomWord(difficultyKey: DifficultyKey): string {
+    const difficulty = wordMaps.get(difficultyKey);
+    if (!difficulty) {
+        console.warn("Difficulty unknwown!")
         return "";
     }
-    const wordList = wordMap.get(Math.random() < 0.5 ? Article.DER : Article.DAS);
+    const wordList = difficulty.wordMap.get(Math.random() < 0.5 ? Article.DER : Article.DAS);
     if (!wordList) {
         console.warn("List of words not found!")
         return "";
@@ -5836,11 +5869,11 @@ export function getRandomWord(difficulty: Difficulty): string {
     return wordList[Math.floor(Math.random() * wordList.length)];
 }
 
-export function isCorrect(guessedArticle: Article, challengeWord: string, difficulty: Difficulty): boolean {
-    const wordMap = wordMaps.get(difficulty);
-    if (!wordMap) {
-        console.warn("Word map not found!")
+export function isCorrect(guessedArticle: Article, challengeWord: string, difficultyKey: DifficultyKey): boolean {
+    const difficulty = wordMaps.get(difficultyKey);
+    if (!difficulty) {
+        console.warn("Difficulty unknwown!")
         return false;
     }
-    return wordMap.get(guessedArticle)?.includes(challengeWord) ?? false;
+    return difficulty.wordMap.get(guessedArticle)?.includes(challengeWord) ?? false;
 }

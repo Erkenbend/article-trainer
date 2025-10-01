@@ -1,7 +1,7 @@
 import {useState} from 'react'
 
 import './App.css'
-import {Article, Difficulty, getRandomWord, isCorrect} from "./word-list.ts";
+import {Article, getRandomWord, isCorrect, type DifficultyKey, supportedDifficulties, translateDifficulty} from "./word-list.ts";
 
 const LOCALE = "en-DE";
 
@@ -15,7 +15,7 @@ interface Score {
 
 interface Challenge {
     readonly currentWord: string;
-    readonly selectedDifficulty: Difficulty;
+    readonly selectedDifficulty: DifficultyKey;
 }
 
 function streakBeaten(score: Score): boolean {
@@ -35,7 +35,7 @@ function displayAsString(duration: number | null): string {
     return duration === null ? '-' : (duration / 1000).toFixed(2);
 }
 
-function chooseNewChallengeWord(currentWord: string, difficulty: Difficulty): string {
+function chooseNewChallengeWord(currentWord: string, difficulty: DifficultyKey): string {
     let newChallengeWord = undefined
     do {
         newChallengeWord = getRandomWord(difficulty)
@@ -117,8 +117,8 @@ function App() {
         bestStreakTimePerWord: null
     });
     const [challenge, updateChallenge] = useState<Challenge>({
-        currentWord: chooseNewChallengeWord("", Difficulty.ADRIEN),
-        selectedDifficulty: Difficulty.ADRIEN
+        currentWord: chooseNewChallengeWord("", "ADRIEN"),
+        selectedDifficulty: "ADRIEN"
     });
 
     function handleResponseButtonClicked(article: Article) {
@@ -200,23 +200,27 @@ function App() {
 
             {/* TODO: extract to separate component */}
             <div className="difficulty-selection">
-                <br/>
                 <label>Wortliste:&nbsp;&nbsp;</label>
                 <select
                     className="difficulty-selector"
                     value={challenge.selectedDifficulty}
                     onChange={e => {
+                        console.log(e.target.value)
                         updateChallenge(c => ({
                             ...c,
-                            selectedDifficulty: e.target.value as Difficulty
+                            selectedDifficulty: e.target.value as DifficultyKey
                         }))
                         resetGame()
                     }}
                 >
-                    <option value={Difficulty.ADRIEN}>{Difficulty.ADRIEN}</option>
-                    <option value={Difficulty.EASY}>{Difficulty.EASY}</option>
-                    <option value={Difficulty.INTERMEDIATE}>{Difficulty.INTERMEDIATE}</option>
-                    <option value={Difficulty.HARD}>{Difficulty.HARD}</option>
+                    {supportedDifficulties.map(key => (
+                        <option key={key} value={key}>{translateDifficulty(key)}</option>
+                    ))}
+
+                    {/*<option value={IDifficulty.ADRIEN}>{IDifficulty.ADRIEN}</option>*/}
+                    {/*<option value={IDifficulty.EASY}>{IDifficulty.EASY}</option>*/}
+                    {/*<option value={IDifficulty.INTERMEDIATE}>{IDifficulty.INTERMEDIATE}</option>*/}
+                    {/*<option value={IDifficulty.HARD}>{IDifficulty.HARD}</option>*/}
 
                     {/* TODO later: make the select block dynamic from enum values */}
                     {/*{getEnumKeys(Difficulty).map((key, index) => (*/}
