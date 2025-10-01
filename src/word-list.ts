@@ -5804,7 +5804,9 @@ interface Difficulty {
     wordMap: Map<Article, string[]>;
 }
 
-export const translateDifficulty = (difficultyKey: DifficultyKey): string => wordMaps.get(difficultyKey)?.translation ?? "";
+export function translateDifficulty(difficultyKey: DifficultyKey): string {
+    return wordMaps.get(difficultyKey)?.translation ?? "";
+}
 
 export const supportedDifficulties = ["ADRIEN", "EASY", "INTERMEDIATE", "HARD"] as const;
 export type DifficultyKey = typeof supportedDifficulties[number];

@@ -3,9 +3,9 @@ import {useState} from 'react'
 import './App.css'
 import {
     Article,
+    type DifficultyKey,
     getRandomWord,
     isCorrect,
-    type DifficultyKey,
     supportedDifficulties,
     translateDifficulty
 } from "./word-list.ts";
@@ -20,9 +20,30 @@ interface Score {
     readonly bestStreakTimePerWord: number | null;
 }
 
+function initScoreSheet() {
+    const initialState = new Map<DifficultyKey, Score>();
+    for (const difficultyKey of supportedDifficulties) {
+        initialState.set(difficultyKey, {
+            currentStreak: 0,
+            currentStreakTimePerWord: null,
+            startTimeCurrentStreak: performance.now(),
+            bestStreak: 0,
+            bestStreakTimePerWord: null
+        })
+    }
+    return initialState;
+}
+
 interface Challenge {
     readonly currentWord: string;
     readonly selectedDifficulty: DifficultyKey;
+}
+
+function initChallenge() {
+    return {
+        currentWord: chooseNewChallengeWord("", "ADRIEN"),
+        selectedDifficulty: "ADRIEN" as DifficultyKey,
+    }
 }
 
 function streakBeaten(score: Score): boolean {
@@ -36,6 +57,32 @@ function streakBeaten(score: Score): boolean {
         return false;
     }
     return score.currentStreakTimePerWord < score.bestStreakTimePerWord;
+}
+
+function updateScore(s: Score, correctAnswer: boolean): Score {
+    if (correctAnswer) {
+        // only start computing streak time on second correct answer
+        return s.currentStreak == 0 ?
+            {
+                ...s,
+                currentStreak: s.currentStreak + 1,
+                startTimeCurrentStreak: performance.now()
+            } :
+            {
+                ...s,
+                currentStreak: s.currentStreak + 1,
+                currentStreakTimePerWord: (performance.now() - s.startTimeCurrentStreak) / s.currentStreak
+            }
+    }
+
+    // save streak and reset on wrong answer
+    return {
+        currentStreak: 0,
+        currentStreakTimePerWord: null,
+        startTimeCurrentStreak: performance.now(),
+        bestStreak: streakBeaten(s) ? s.currentStreak : s.bestStreak,
+        bestStreakTimePerWord: streakBeaten(s) ? s.currentStreakTimePerWord : s.bestStreakTimePerWord
+    }
 }
 
 function displayAsString(duration: number | null): string {
@@ -52,6 +99,7 @@ function chooseNewChallengeWord(currentWord: string, difficulty: DifficultyKey):
 
 function StreakIndicatorTable(props: { score: Score }) {
     const {score} = props
+
     return <table className="streak-indicator">
         <thead>
         <tr>
@@ -136,18 +184,8 @@ function Footer() {
 function App() {
 
     const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
-    // TODO: score per difficulty
-    const [score, updateScore] = useState<Score>({
-        currentStreak: 0,
-        currentStreakTimePerWord: null,
-        startTimeCurrentStreak: performance.now(),
-        bestStreak: 0,
-        bestStreakTimePerWord: null
-    });
-    const [challenge, updateChallenge] = useState<Challenge>({
-        currentWord: chooseNewChallengeWord("", "ADRIEN"),
-        selectedDifficulty: "ADRIEN"
-    });
+    const [scoreSheet, updateScoreSheet] = useState<Map<DifficultyKey, Score>>(initScoreSheet);
+    const [challenge, updateChallenge] = useState<Challenge>(initChallenge);
 
     function handleResponseButtonClicked(article: Article) {
         const correctAnswer = isCorrect(article, challenge.currentWord, challenge.selectedDifficulty);
@@ -156,30 +194,14 @@ function App() {
             ...c,
             currentWord: chooseNewChallengeWord(c.currentWord, c.selectedDifficulty)
         }))
-        updateScore(s => {
-            if (correctAnswer) {
-                // only start computing streak time on second correct answer
-                return s.currentStreak == 0 ?
-                    {
-                        ...s,
-                        currentStreak: s.currentStreak + 1,
-                        startTimeCurrentStreak: performance.now()
-                    } :
-                    {
-                        ...s,
-                        currentStreak: s.currentStreak + 1,
-                        currentStreakTimePerWord: (performance.now() - s.startTimeCurrentStreak) / s.currentStreak
-                    }
-            }
-
-            // save streak and reset on wrong answer
-            return {
-                currentStreak: 0,
-                currentStreakTimePerWord: null,
-                startTimeCurrentStreak: performance.now(),
-                bestStreak: streakBeaten(s) ? s.currentStreak : s.bestStreak,
-                bestStreakTimePerWord: streakBeaten(s) ? s.currentStreakTimePerWord : s.bestStreakTimePerWord
-            }
+        updateScoreSheet(s => {
+            const updatedScoreSheet = new Map(s)
+            updatedScoreSheet.set(
+                challenge.selectedDifficulty,
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                updateScore(updatedScoreSheet.get(challenge.selectedDifficulty)!, correctAnswer)
+            )
+            return updatedScoreSheet;
         })
     }
 
@@ -189,17 +211,26 @@ function App() {
             ...c,
             currentWord: chooseNewChallengeWord(c.currentWord, c.selectedDifficulty)
         }))
-        updateScore({
-            ...score,
-            currentStreak: 0,
-            currentStreakTimePerWord: null,
-            startTimeCurrentStreak: performance.now()
-        })
+        updateScoreSheet(
+            s => {
+                const updatedScoreSheet = new Map(s)
+                updatedScoreSheet.set(
+                    challenge.selectedDifficulty,
+                    {
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        ...updatedScoreSheet.get(challenge.selectedDifficulty)!,
+                        currentStreak: 0,
+                        currentStreakTimePerWord: null,
+                        startTimeCurrentStreak: performance.now()
+                    })
+                return updatedScoreSheet;
+            })
     }
 
     return (
         <>
-            <StreakIndicatorTable score={score}/>
+            {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
+            <StreakIndicatorTable score={scoreSheet.get(challenge.selectedDifficulty)!}/>
 
             <div className="challenge-word">
                 {challenge.currentWord}
