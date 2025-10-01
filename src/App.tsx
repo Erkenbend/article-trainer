@@ -1,7 +1,14 @@
 import {useState} from 'react'
 
 import './App.css'
-import {Article, getRandomWord, isCorrect, type DifficultyKey, supportedDifficulties, translateDifficulty} from "./word-list.ts";
+import {
+    Article,
+    getRandomWord,
+    isCorrect,
+    type DifficultyKey,
+    supportedDifficulties,
+    translateDifficulty
+} from "./word-list.ts";
 
 const LOCALE = "en-DE";
 
@@ -89,6 +96,27 @@ function LastAnswerDiv(props: { lastAnswerCorrect: boolean | null }) {
         <div className="last-answer-status-incorrect">
             INKORREKT!
         </div>
+    </div>
+}
+
+function DifficultySelectionDiv(props: {
+    selectedDifficulty: DifficultyKey,
+    onChange: (difficulty: DifficultyKey) => void
+}) {
+    const {selectedDifficulty, onChange} = props
+    return <div className="difficulty-selection">
+        <label>Wortliste:&nbsp;&nbsp;</label>
+        <select
+            className="difficulty-selector"
+            value={selectedDifficulty}
+            onChange={e => {
+                onChange(e.target.value as DifficultyKey);
+            }}
+        >
+            {supportedDifficulties.map(key => (
+                <option key={key} value={key}>{translateDifficulty(key)}</option>
+            ))}
+        </select>
     </div>
 }
 
@@ -198,25 +226,13 @@ function App() {
                 <button type="button" className="reset-button" onClick={resetGame}>Zurücksetzen</button>
             </div>
 
-            {/* TODO: extract to separate component */}
-            <div className="difficulty-selection">
-                <label>Wortliste:&nbsp;&nbsp;</label>
-                <select
-                    className="difficulty-selector"
-                    value={challenge.selectedDifficulty}
-                    onChange={e => {
-                        updateChallenge(c => ({
-                            ...c,
-                            selectedDifficulty: e.target.value as DifficultyKey
-                        }))
-                        resetGame()
-                    }}
-                >
-                    {supportedDifficulties.map(key => (
-                        <option key={key} value={key}>{translateDifficulty(key)}</option>
-                    ))}
-                </select>
-            </div>
+            <DifficultySelectionDiv
+                selectedDifficulty={challenge.selectedDifficulty}
+                onChange={(newValue: DifficultyKey) => {
+                    updateChallenge(c => ({...c, selectedDifficulty: newValue}))
+                    resetGame()
+                }}
+            />
 
             <Footer/>
         </>
