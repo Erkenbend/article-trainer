@@ -1,24 +1,13 @@
 import {useState} from 'react'
 
 import './App.css'
-import {
-    Article,
-    type DifficultyKey,
-    getRandomWord,
-    isCorrect,
-    supportedDifficulties,
-    translateDifficulty
-} from "./word-list.ts";
-
-const LOCALE = "en-DE";
-
-interface Score {
-    readonly currentStreak: number;
-    readonly currentStreakTimePerWord: number | null;
-    readonly startTimeCurrentStreak: number;
-    readonly bestStreak: number;
-    readonly bestStreakTimePerWord: number | null;
-}
+import {Article, type DifficultyKey, getRandomWord, isCorrect, supportedDifficulties} from "./word-list.ts";
+import {LastAnswerDiv} from "./components/LastAnswerDiv.tsx";
+import {DifficultySelectionDiv} from "./components/DifficultySelectionDiv.tsx";
+import {Footer} from "./components/Footer.tsx";
+import type {Score} from "./state/Score.tsx";
+import type {Challenge} from "./state/Challenge.tsx";
+import {StreakIndicatorTable} from "./components/StreakIndicatorTable.tsx";
 
 function initScoreSheet() {
     const initialState = new Map<DifficultyKey, Score>();
@@ -32,11 +21,6 @@ function initScoreSheet() {
         })
     }
     return initialState;
-}
-
-interface Challenge {
-    readonly currentWord: string;
-    readonly selectedDifficulty: DifficultyKey;
 }
 
 function initChallenge() {
@@ -85,10 +69,6 @@ function updateScore(s: Score, correctAnswer: boolean): Score {
     }
 }
 
-function displayAsString(duration: number | null): string {
-    return duration === null ? '-' : (duration / 1000).toFixed(2);
-}
-
 function chooseNewChallengeWord(currentWord: string, difficulty: DifficultyKey): string {
     let newChallengeWord = undefined
     do {
@@ -97,92 +77,7 @@ function chooseNewChallengeWord(currentWord: string, difficulty: DifficultyKey):
     return newChallengeWord
 }
 
-function StreakIndicatorTable(props: { score: Score }) {
-    const {score} = props
-
-    return <table className="streak-indicator">
-        <thead>
-        <tr>
-            <th className="current-streak">Aktuell</th>
-            <th className="best-streak">Rekord</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td className="current-streak">
-                Streak: {score.currentStreak}
-            </td>
-            <td className="best-streak">
-                Streak: {score.bestStreak}
-            </td>
-        </tr>
-        <tr>
-            <td className="current-streak">
-                ({displayAsString(score.currentStreakTimePerWord)} s/Wort)
-            </td>
-            <td className="best-streak">
-                ({displayAsString(score.bestStreakTimePerWord)} s/Wort)
-            </td>
-        </tr>
-        </tbody>
-    </table>
-}
-
-function LastAnswerDiv(props: { lastAnswerCorrect: boolean | null }) {
-    const {lastAnswerCorrect} = props
-    if (lastAnswerCorrect == null) {
-        return <div className="last-answer">&nbsp;</div>
-    }
-    if (lastAnswerCorrect) {
-        return <div className="last-answer">
-            <div className="last-answer-status-correct">
-                KORREKT!
-            </div>
-        </div>
-    }
-    return <div className="last-answer">
-        <div className="last-answer-status-incorrect">
-            INKORREKT!
-        </div>
-    </div>
-}
-
-function DifficultySelectionDiv(props: {
-    selectedDifficulty: DifficultyKey,
-    onChange: (difficulty: DifficultyKey) => void
-}) {
-    const {selectedDifficulty, onChange} = props
-    return <div className="difficulty-selection">
-        <label>Wortliste:&nbsp;&nbsp;</label>
-        <select
-            className="difficulty-selector"
-            value={selectedDifficulty}
-            onChange={e => {
-                onChange(e.target.value as DifficultyKey);
-            }}
-        >
-            {supportedDifficulties.map(key => (
-                <option key={key} value={key}>{translateDifficulty(key)}</option>
-            ))}
-        </select>
-    </div>
-}
-
-function Footer() {
-    return <div className="footer">
-        <div className="build-timestamp">
-            Version: {new Date(BUILD_TIMESTAMP).toLocaleString(LOCALE)}
-        </div>
-        <div className="github-logo">
-            <a href="https://github.com/Erkenbend/article-trainer">
-                <img src="/github-mark-white.svg" alt="GitHub Logo" width="30px"/>
-            </a>
-        </div>
-    </div>
-}
-
 function App() {
-
     const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
     const [scoreSheet, updateScoreSheet] = useState<Map<DifficultyKey, Score>>(initScoreSheet);
     const [challenge, updateChallenge] = useState<Challenge>(initChallenge);
