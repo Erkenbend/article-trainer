@@ -205,7 +205,6 @@ function App() {
                     className="difficulty-selector"
                     value={challenge.selectedDifficulty}
                     onChange={e => {
-                        console.log(e.target.value)
                         updateChallenge(c => ({
                             ...c,
                             selectedDifficulty: e.target.value as DifficultyKey
@@ -216,19 +215,6 @@ function App() {
                     {supportedDifficulties.map(key => (
                         <option key={key} value={key}>{translateDifficulty(key)}</option>
                     ))}
-
-                    {/*<option value={IDifficulty.ADRIEN}>{IDifficulty.ADRIEN}</option>*/}
-                    {/*<option value={IDifficulty.EASY}>{IDifficulty.EASY}</option>*/}
-                    {/*<option value={IDifficulty.INTERMEDIATE}>{IDifficulty.INTERMEDIATE}</option>*/}
-                    {/*<option value={IDifficulty.HARD}>{IDifficulty.HARD}</option>*/}
-
-                    {/* TODO later: make the select block dynamic from enum values */}
-                    {/*{getEnumKeys(Difficulty).map((key, index) => (*/}
-                    {/*    // eslint-disable-next-line react-x/no-array-index-key*/}
-                    {/*    <option key={index} value={key}>*/}
-                    {/*        {Difficulty[key]}*/}
-                    {/*    </option>*/}
-                    {/*))}*/}
                 </select>
             </div>
 

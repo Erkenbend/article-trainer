@@ -3,51 +3,6 @@ export enum Article {
     DAS,
 }
 
-// export enum Difficulty {
-//     ADRIEN = "Adrien",
-//     EASY = "Anfänger (A1/A2)",
-//     INTERMEDIATE = "Fortgeschritten (B1/B2)",
-//     HARD = "Experte (C1/C2)",
-// }
-
-interface Difficulty {
-    translation: string;
-    wordMap: Map<Article, string[]>;
-}
-
-// export enum Difficulty {
-//     ADRIEN,
-//     EASY,
-//     INTERMEDIATE,
-//     HARD,
-// }
-
-// const difficultyTranslation = new Map<Difficulty, string>([
-//     [Difficulty.ADRIEN, "Adrien"],
-//     [Difficulty.EASY, "Anfänger (A1/A2)"],
-//     [Difficulty.INTERMEDIATE, "Fortgeschritten (B1/B2)"],
-//     [Difficulty.HARD, "Experte (C1/C2)"],
-// ]);
-
-export const translateDifficulty = (difficultyKey: DifficultyKey): string => wordMaps.get(difficultyKey)?.translation ?? "";
-
-// export const Difficulty = {
-//     ADRIEN: "Adrien",
-//     EASY: "Anfänger (A1/A2)",
-//     INTERMEDIATE: "Fortgeschritten (B1/B2)",
-//     HARD: "Experte (C1/C2)",
-// } as const;
-//
-// export type TDifficulty = typeof Difficulty[keyof typeof Difficulty];
-
-
-// export function getEnumKeys<
-//     T extends string,
-//     TEnumValue extends string | number,
-// >(enumVariable: { [key in T]: TEnumValue }) {
-//     return Object.keys(enumVariable) as Array<T>;
-// }
-
 // TEMPLATE FOR WORD MAPS
 // const templateWordMap = new Map<Article, string[]>([
 //     [Article.DER, [
@@ -5844,7 +5799,13 @@ const hardWordMap = new Map<Article, string[]>([
     ]]
 ]);
 
-// const difficultyKeys = Array.from(wordMaps.keys()) as const;
+interface Difficulty {
+    translation: string;
+    wordMap: Map<Article, string[]>;
+}
+
+export const translateDifficulty = (difficultyKey: DifficultyKey): string => wordMaps.get(difficultyKey)?.translation ?? "";
+
 export const supportedDifficulties = ["ADRIEN", "EASY", "INTERMEDIATE", "HARD"] as const;
 export type DifficultyKey = typeof supportedDifficulties[number];
 
