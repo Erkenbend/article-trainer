@@ -1,7 +1,7 @@
 import {useState} from 'react'
 
 import './App.css'
-import {Article, type DifficultyKey, getRandomWord, isCorrect, supportedDifficulties} from "./word-list.ts";
+import {type Article, type DifficultyKey, getRandomWord, isCorrect, supportedDifficulties} from "./word-list.ts";
 import {LastAnswerDiv} from "./components/LastAnswerDiv.tsx";
 import {DifficultySelectionDiv} from "./components/DifficultySelectionDiv.tsx";
 import {Footer} from "./components/Footer.tsx";
@@ -9,10 +9,10 @@ import type {Score} from "./state/Score.tsx";
 import type {Challenge} from "./state/Challenge.tsx";
 import {StreakIndicatorTable} from "./components/StreakIndicatorTable.tsx";
 
-function initScoreSheet() {
+function initScoreSheet() : Map<DifficultyKey, Score> {
     const initialState = new Map<DifficultyKey, Score>();
     for (const difficultyKey of supportedDifficulties) {
-        initialState.set(difficultyKey, {
+        initialState.set(difficultyKey as DifficultyKey, {
             currentStreak: 0,
             currentStreakTimePerWord: null,
             startTimeCurrentStreak: performance.now(),
@@ -134,13 +134,13 @@ function App() {
             <div className="response-buttons">
                 <button type="button" className="response-button"
                         onClick={() => {
-                            handleResponseButtonClicked(Article.DER)
+                            handleResponseButtonClicked("DER")
                         }}>
                     DER
                 </button>
                 <button type="button" className="response-button"
                         onClick={() => {
-                            handleResponseButtonClicked(Article.DAS)
+                            handleResponseButtonClicked("DAS")
                         }}>
                     DAS
                 </button>

@@ -1,20 +1,27 @@
-export enum Article {
-    DER,
-    DAS,
+interface WordMap {
+    readonly DER: string[];
+    readonly DAS: string[];
+}
+
+export type Article = keyof WordMap;
+
+interface Difficulty {
+    readonly translation: string;
+    readonly wordMap: WordMap;
 }
 
 // TEMPLATE FOR WORD MAPS
-// const templateWordMap = new Map<Article, string[]>([
-//     [Article.DER, [
+// const templateWordMap = {
+//     DER: [
 //
-//     ]],
-//     [Article.DAS, [
+//     ],
+//     DAS: [
 //
-//     ]]
-// ]);
+//     ]
+// };
 
-const adrienWordMap = new Map<Article, string[]>([
-    [Article.DER, [
+const adrienWordMap: WordMap = {
+    DER: [
         "Effekt",
         "Aspekt",
         "Bär",
@@ -66,8 +73,8 @@ const adrienWordMap = new Map<Article, string[]>([
         "Kran",
         "Kram",
         "Zopf",
-    ]],
-    [Article.DAS, [
+    ],
+    DAS: [
         "Geschlecht",
         "Tor",
         "Heim",
@@ -103,11 +110,11 @@ const adrienWordMap = new Map<Article, string[]>([
         "Modell",
         "Seil",
         "Amt",
-    ]]
-]);
+    ]
+};
 
-const easyWordMap = new Map<Article, string[]>([
-    [Article.DER, [
+const easyWordMap: WordMap = {
+    DER: [
         "Mensch",
         "Mann",
         "Tag",
@@ -762,8 +769,8 @@ const easyWordMap = new Map<Article, string[]>([
         "Truthah",
         "Locher",
         "Opi",
-    ]],
-    [Article.DAS, [
+    ],
+    DAS: [
         "Mal",
         "Jahr",
         "Deutsch",
@@ -1139,11 +1146,11 @@ const easyWordMap = new Map<Article, string[]>([
         "Bügeleise",
         "Weissbier",
         "Motorboot",
-    ]]
-]);
+    ]
+};
 
-const intermediateWordMap = new Map<Article, string[]>([
-    [Article.DER, [
+const intermediateWordMap: WordMap = {
+    DER: [
         "Fall",
         "Stand",
         "Gott",
@@ -3939,8 +3946,8 @@ const intermediateWordMap = new Map<Article, string[]>([
         "Spielzug",
         "Strafstoss",
         "Stöpsel",
-    ]],
-    [Article.DAS, [
+    ],
+    DAS: [
         "Recht",
         "System",
         "Medium",
@@ -5175,11 +5182,11 @@ const intermediateWordMap = new Map<Article, string[]>([
         "Pergament",
         "Routing",
         "Sommerhaus",
-    ]]
-]);
+    ]
+};
 
-const hardWordMap = new Map<Article, string[]>([
-    [Article.DER, [
+const hardWordMap: WordMap = {
+    DER: [
         "Herzog",
         "Terrorist",
         "Sog",
@@ -5576,8 +5583,8 @@ const hardWordMap = new Map<Article, string[]>([
         "Illuminat",
         "Imp",
         "Prälat",
-    ]],
-    [Article.DAS, [
+    ],
+    DAS: [
         "Mark",
         "Lee",
         "Gutachte",
@@ -5796,47 +5803,30 @@ const hardWordMap = new Map<Article, string[]>([
         "Silizium",
         "Sterbebett",
         "Tableau",
-    ]]
-]);
+    ]
+};
 
-interface Difficulty {
-    translation: string;
-    wordMap: Map<Article, string[]>;
+const wordMaps = {
+    ADRIEN: {translation: "Adrien", wordMap: adrienWordMap},
+    EASY: {translation: "Anfänger (A1/A2)", wordMap: easyWordMap},
+    INTERMEDIATE: {translation: "Fortgeschritten (B1/B2)", wordMap: intermediateWordMap},
+    HARD: {translation: "Experte (C1/C2)", wordMap: hardWordMap}
 }
+
+export type DifficultyKey = keyof typeof wordMaps;
+export const supportedDifficulties = Object.keys(wordMaps);
 
 export function translateDifficulty(difficultyKey: DifficultyKey): string {
-    return wordMaps.get(difficultyKey)?.translation ?? "";
+    return wordMaps[difficultyKey].translation;
 }
 
-export const supportedDifficulties = ["ADRIEN", "EASY", "INTERMEDIATE", "HARD"] as const;
-export type DifficultyKey = typeof supportedDifficulties[number];
-
-const wordMaps = new Map<DifficultyKey, Difficulty>([
-    ["ADRIEN", { translation: "Adrien", wordMap: adrienWordMap}],
-    ["EASY", { translation: "Anfänger (A1/A2)", wordMap: easyWordMap}],
-    ["INTERMEDIATE", { translation: "Fortgeschritten (B1/B2)", wordMap: intermediateWordMap}],
-    ["HARD", { translation: "Experte (C1/C2)", wordMap: hardWordMap}],
-])
-
 export function getRandomWord(difficultyKey: DifficultyKey): string {
-    const difficulty = wordMaps.get(difficultyKey);
-    if (!difficulty) {
-        console.warn("Difficulty unknwown!")
-        return "";
-    }
-    const wordList = difficulty.wordMap.get(Math.random() < 0.5 ? Article.DER : Article.DAS);
-    if (!wordList) {
-        console.warn("List of words not found!")
-        return "";
-    }
+    const difficulty: Difficulty = wordMaps[difficultyKey];
+    const wordList = difficulty.wordMap[Math.random() < 0.5 ? 'DER' : 'DAS'];
     return wordList[Math.floor(Math.random() * wordList.length)];
 }
 
 export function isCorrect(guessedArticle: Article, challengeWord: string, difficultyKey: DifficultyKey): boolean {
-    const difficulty = wordMaps.get(difficultyKey);
-    if (!difficulty) {
-        console.warn("Difficulty unknwown!")
-        return false;
-    }
-    return difficulty.wordMap.get(guessedArticle)?.includes(challengeWord) ?? false;
+    const difficulty: Difficulty = wordMaps[difficultyKey];
+    return difficulty.wordMap[guessedArticle].includes(challengeWord);
 }
