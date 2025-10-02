@@ -1,81 +1,13 @@
 import {useState} from 'react'
 
 import './App.css'
-import {type Article, type DifficultyKey, getRandomWord, isCorrect, supportedDifficulties} from "./word-list.ts";
+import {type Article, type DifficultyKey, isCorrect} from "./word-list.ts";
 import {LastAnswerDiv} from "./components/LastAnswerDiv.tsx";
 import {DifficultySelectionDiv} from "./components/DifficultySelectionDiv.tsx";
 import {Footer} from "./components/Footer.tsx";
-import type {Score} from "./state/Score.tsx";
-import type {Challenge} from "./state/Challenge.tsx";
+import {initScoreSheet, type Score, updateScore} from "./state/Score.tsx";
+import {type Challenge, chooseNewChallengeWord, initChallenge} from "./state/Challenge.tsx";
 import {StreakIndicatorTable} from "./components/StreakIndicatorTable.tsx";
-
-function initScoreSheet() : Map<DifficultyKey, Score> {
-    const initialState = new Map<DifficultyKey, Score>();
-    for (const difficultyKey of supportedDifficulties) {
-        initialState.set(difficultyKey as DifficultyKey, {
-            currentStreak: 0,
-            currentStreakTimePerWord: null,
-            startTimeCurrentStreak: performance.now(),
-            bestStreak: 0,
-            bestStreakTimePerWord: null
-        })
-    }
-    return initialState;
-}
-
-function initChallenge() {
-    return {
-        currentWord: chooseNewChallengeWord("", "ADRIEN"),
-        selectedDifficulty: "ADRIEN" as DifficultyKey,
-    }
-}
-
-function streakBeaten(score: Score): boolean {
-    if (score.currentStreak > score.bestStreak) {
-        return true;
-    }
-    if (score.currentStreak < score.bestStreak) {
-        return false;
-    }
-    if (score.currentStreakTimePerWord === null || score.bestStreakTimePerWord === null) {
-        return false;
-    }
-    return score.currentStreakTimePerWord < score.bestStreakTimePerWord;
-}
-
-function updateScore(s: Score, correctAnswer: boolean): Score {
-    if (correctAnswer) {
-        // only start computing streak time on second correct answer
-        return s.currentStreak == 0 ?
-            {
-                ...s,
-                currentStreak: s.currentStreak + 1,
-                startTimeCurrentStreak: performance.now()
-            } :
-            {
-                ...s,
-                currentStreak: s.currentStreak + 1,
-                currentStreakTimePerWord: (performance.now() - s.startTimeCurrentStreak) / s.currentStreak
-            }
-    }
-
-    // save streak and reset on wrong answer
-    return {
-        currentStreak: 0,
-        currentStreakTimePerWord: null,
-        startTimeCurrentStreak: performance.now(),
-        bestStreak: streakBeaten(s) ? s.currentStreak : s.bestStreak,
-        bestStreakTimePerWord: streakBeaten(s) ? s.currentStreakTimePerWord : s.bestStreakTimePerWord
-    }
-}
-
-function chooseNewChallengeWord(currentWord: string, difficulty: DifficultyKey): string {
-    let newChallengeWord = undefined
-    do {
-        newChallengeWord = getRandomWord(difficulty)
-    } while (newChallengeWord === currentWord)
-    return newChallengeWord
-}
 
 function App() {
     const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
@@ -84,6 +16,7 @@ function App() {
 
     function handleResponseButtonClicked(article: Article) {
         const correctAnswer = isCorrect(article, challenge.currentWord, challenge.selectedDifficulty);
+
         setLastAnswerCorrect(() => correctAnswer)
         updateChallenge(c => ({
             ...c,

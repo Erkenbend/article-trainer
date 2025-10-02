@@ -15,7 +15,7 @@ export function DifficultySelectionDiv(props: {
             }}
         >
             {supportedDifficulties.map(key => (
-                <option key={key} value={key}>{translateDifficulty(key)}</option>
+                <option key={key} value={key}>{translateDifficulty(key as DifficultyKey)}</option>
             ))}
         </select>
     </div>
