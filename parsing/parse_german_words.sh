@@ -10,8 +10,8 @@ jq_filter_string() {
 }
 
 wrap_in_quotes() {
-  while IFS=$'\n' read -r in; do
-    echo "\"$in\","
+  while read line; do
+    echo "\"$line\","
   done
 }
 
