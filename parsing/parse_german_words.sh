@@ -1,11 +1,12 @@
 all_words=$(curl -s -X GET https://raw.githubusercontent.com/vbvss199/Language-Learning-decks/refs/heads/main/german/german.json)
+minLength=3
 maxLength=10
 
 jq_filter_string() {
   # $1: gender
   # $2: comma separated difficulty
   difficulties=$(echo "[\"$2\"]" | sed 's/,/\",\"/g')
-  echo ".[] | select((.gender == \"$1\") and (.cefr_level as \$l | $difficulties | index(\$l))) | select(.word | length <= $maxLength) | .word"
+  echo ".[] | select((.gender == \"$1\") and (.cefr_level as \$l | $difficulties | index(\$l))) | select(.word | length <= $maxLength and length >= $minLength) | .word"
 }
 
 wrap_in_quotes() {
