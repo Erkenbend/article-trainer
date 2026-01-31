@@ -12,30 +12,35 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4.2.2
 
-      - name: Setup Node/NPM
+      - name: Setup Node
         uses: actions/setup-node@v4.4.0
         with:
           node-version: 22
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.8
+
       - name: Install dependencies
         run: |
-          npm install
+          bun install
 
       - name: Install infrastructure dependencies
         run: |
-          cd infrastructure && npm install
+          cd infrastructure && bun install
 
       - name: Lint
         run: |
-          npm run lint
+          bun run lint
 
       - name: Build application
         run: |
-          CI=false npm run build
+          CI=false bun run build
 
       - name: CDK diff
         run: |
-          cd infrastructure && npx cdk diff
+          cd infrastructure && bunx cdk diff
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -43,7 +48,7 @@ jobs:
 
       - name: CDK deploy
         run: |
-          cd infrastructure && npx cdk deploy --require-approval never "ArticleTrainerInfrastructureStack"
+          cd infrastructure && bunx cdk deploy --require-approval never "ArticleTrainerInfrastructureStack"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
