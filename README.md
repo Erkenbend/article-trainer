@@ -4,13 +4,13 @@ Trainiere schwierige Substantive interaktiv → https://der-oder-das.ninasworksh
 
 ## Commands
 
-Get started: `npm install`
+Get started: `bun install`
 
-Run dev server: `npm run dev`
+Run dev server: `bun dev`
 
-Lint project: `npm run lint`
+Lint project: `bun lint`
 
-Build production site: `npm run build`
+Build production site: `bun run build`
 
 # Artwork sources
 
