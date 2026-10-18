@@ -1,21 +1,24 @@
-import {type DifficultyKey, getRandomWord} from "../word-list.ts";
+import { type Article, type DifficultyKey, getRandomWord } from "../word-list.ts";
 
 export interface Challenge {
     readonly currentWord: string;
+    readonly expectedArticle: Article;
     readonly selectedDifficulty: DifficultyKey;
 }
 
-export function chooseNewChallengeWord(currentWord: string, difficulty: DifficultyKey): string {
-    let newChallengeWord = undefined
+export function chooseNewChallengeWord(currentWord: string, difficulty: DifficultyKey): { word: string, article: Article } {
+    let newChallengeWord = { word: "", article: 'DER' as Article }
     do {
         newChallengeWord = getRandomWord(difficulty)
-    } while (newChallengeWord === currentWord)
-    return newChallengeWord
+    } while (newChallengeWord.word === currentWord)
+    return newChallengeWord;
 }
 
-export function initChallenge() {
+export function initChallenge(): Challenge {
+    const newChallengeWord = chooseNewChallengeWord("", "ADRIEN");
     return {
-        currentWord: chooseNewChallengeWord("", "ADRIEN"),
-        selectedDifficulty: "ADRIEN" as DifficultyKey,
+        currentWord: newChallengeWord.word,
+        expectedArticle: newChallengeWord.article,
+        selectedDifficulty: "ADRIEN",
     }
 }

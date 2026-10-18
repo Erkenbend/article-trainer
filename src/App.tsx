@@ -1,27 +1,38 @@
-import {useState} from 'react'
+import { useState } from 'react'
 
 import './App.css'
-import {type Article, type DifficultyKey, isCorrect} from "./word-list.ts";
-import {LastAnswerDiv} from "./components/LastAnswerDiv.tsx";
-import {DifficultySelectionDiv} from "./components/DifficultySelectionDiv.tsx";
-import {Footer} from "./components/Footer.tsx";
-import {initScoreSheet, type Score, updateScore} from "./state/Score.tsx";
-import {type Challenge, chooseNewChallengeWord, initChallenge} from "./state/Challenge.tsx";
-import {StreakIndicatorTable} from "./components/StreakIndicatorTable.tsx";
+import { type Article, type DifficultyKey, isCorrect } from "./word-list.ts";
+import { LastAnswerDiv } from "./components/LastAnswerDiv.tsx";
+import { DifficultySelectionDiv } from "./components/DifficultySelectionDiv.tsx";
+import { Footer } from "./components/Footer.tsx";
+import { initScoreSheet, type Score, updateScore } from "./state/Score.tsx";
+import { type Challenge, chooseNewChallengeWord, initChallenge } from "./state/Challenge.tsx";
+import { StreakIndicatorTable } from "./components/StreakIndicatorTable.tsx";
+import { initLastAnswer, type LastAnswer } from './state/LastAnswer.tsx';
 
 function App() {
-    const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
+    const [lastAnswerCorrect, setLastAnswerCorrect] = useState<LastAnswer>(initLastAnswer);
     const [scoreSheet, updateScoreSheet] = useState<Map<DifficultyKey, Score>>(initScoreSheet);
     const [challenge, updateChallenge] = useState<Challenge>(initChallenge);
 
     function handleResponseButtonClicked(article: Article) {
         const correctAnswer = isCorrect(article, challenge.currentWord, challenge.selectedDifficulty);
 
-        setLastAnswerCorrect(() => correctAnswer)
-        updateChallenge(c => ({
-            ...c,
-            currentWord: chooseNewChallengeWord(c.currentWord, c.selectedDifficulty)
-        }))
+        setLastAnswerCorrect(() => {
+            return {
+                wasCorrect: correctAnswer,
+                correctArticle: challenge.expectedArticle,
+                challengeWord: challenge.currentWord,
+            }
+        })
+        updateChallenge(c => {
+            const challengeWord = chooseNewChallengeWord(c.currentWord, c.selectedDifficulty)
+            return {
+                ...c,
+                currentWord: challengeWord.word,
+                expectedArticle: challengeWord.article
+            }
+        })
         updateScoreSheet(s => {
             const updatedScoreSheet = new Map(s)
             updatedScoreSheet.set(
@@ -34,11 +45,15 @@ function App() {
     }
 
     function resetGame() {
-        setLastAnswerCorrect(null)
-        updateChallenge(c => ({
-            ...c,
-            currentWord: chooseNewChallengeWord(c.currentWord, c.selectedDifficulty)
-        }))
+        setLastAnswerCorrect(initLastAnswer)
+        updateChallenge(c => {
+            const challengeWord = chooseNewChallengeWord(c.currentWord, c.selectedDifficulty)
+            return {
+                ...c,
+                currentWord: challengeWord.word,
+                expectedArticle: challengeWord.article
+            }
+        })
         updateScoreSheet(
             s => {
                 const updatedScoreSheet = new Map(s)
@@ -58,7 +73,7 @@ function App() {
     return (
         <>
             {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
-            <StreakIndicatorTable score={scoreSheet.get(challenge.selectedDifficulty)!}/>
+            <StreakIndicatorTable score={scoreSheet.get(challenge.selectedDifficulty)!} />
 
             <div className="challenge-word">
                 {challenge.currentWord}
@@ -66,20 +81,20 @@ function App() {
 
             <div className="response-buttons">
                 <button type="button" className="response-button"
-                        onClick={() => {
-                            handleResponseButtonClicked("DER")
-                        }}>
+                    onClick={() => {
+                        handleResponseButtonClicked("DER")
+                    }}>
                     DER
                 </button>
                 <button type="button" className="response-button"
-                        onClick={() => {
-                            handleResponseButtonClicked("DAS")
-                        }}>
+                    onClick={() => {
+                        handleResponseButtonClicked("DAS")
+                    }}>
                     DAS
                 </button>
             </div>
 
-            <LastAnswerDiv lastAnswerCorrect={lastAnswerCorrect}/>
+            <LastAnswerDiv lastAnswer={lastAnswerCorrect} />
 
             <div className="reset-section">
                 <button type="button" className="reset-button" onClick={resetGame}>Zurücksetzen</button>
@@ -88,12 +103,12 @@ function App() {
             <DifficultySelectionDiv
                 selectedDifficulty={challenge.selectedDifficulty}
                 onChange={(newValue: DifficultyKey) => {
-                    updateChallenge(c => ({...c, selectedDifficulty: newValue}))
+                    updateChallenge(c => ({ ...c, selectedDifficulty: newValue }))
                     resetGame()
                 }}
             />
 
-            <Footer/>
+            <Footer />
         </>
     )
 }

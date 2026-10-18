@@ -5850,10 +5850,10 @@ const hardWordMap: WordMap = {
 };
 
 const wordMaps = {
-    ADRIEN: {translation: "Adrien", wordMap: adrienWordMap},
-    EASY: {translation: "Anfänger (A1/A2)", wordMap: easyWordMap},
-    INTERMEDIATE: {translation: "Fortgeschritten (B1/B2)", wordMap: intermediateWordMap},
-    HARD: {translation: "Experte (C1/C2)", wordMap: hardWordMap}
+    ADRIEN: { translation: "Adrien", wordMap: adrienWordMap },
+    EASY: { translation: "Anfänger (A1/A2)", wordMap: easyWordMap },
+    INTERMEDIATE: { translation: "Fortgeschritten (B1/B2)", wordMap: intermediateWordMap },
+    HARD: { translation: "Experte (C1/C2)", wordMap: hardWordMap }
 }
 
 export type DifficultyKey = keyof typeof wordMaps;
@@ -5863,10 +5863,11 @@ export function translateDifficulty(difficultyKey: DifficultyKey): string {
     return wordMaps[difficultyKey].translation;
 }
 
-export function getRandomWord(difficultyKey: DifficultyKey): string {
+export function getRandomWord(difficultyKey: DifficultyKey): { word: string, article: Article } {
     const difficulty: Difficulty = wordMaps[difficultyKey];
-    const wordList = difficulty.wordMap[Math.random() < 0.5 ? 'DER' : 'DAS'];
-    return wordList[Math.floor(Math.random() * wordList.length)];
+    const article: Article = Math.random() < 0.5 ? 'DER' : 'DAS';
+    const wordList = difficulty.wordMap[article];
+    return { word: wordList[Math.floor(Math.random() * wordList.length)], article };
 }
 
 export function isCorrect(guessedArticle: Article, challengeWord: string, difficultyKey: DifficultyKey): boolean {
