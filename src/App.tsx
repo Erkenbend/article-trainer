@@ -8,17 +8,17 @@ import { Footer } from "./components/Footer.tsx";
 import { initScoreSheet, type Score, updateScore } from "./state/Score.tsx";
 import { type Challenge, chooseNewChallengeWord, initChallenge } from "./state/Challenge.tsx";
 import { StreakIndicatorTable } from "./components/StreakIndicatorTable.tsx";
-import { initLastAnswer, type LastAnswer } from './state/LastAnswer.tsx';
+import { type LastAnswer } from './state/LastAnswer.tsx';
 
 function App() {
-    const [lastAnswerCorrect, setLastAnswerCorrect] = useState<LastAnswer>(initLastAnswer);
+    const [lastAnswer, setLastAnswer] = useState<LastAnswer | null>(null);
     const [scoreSheet, updateScoreSheet] = useState<Map<DifficultyKey, Score>>(initScoreSheet);
     const [challenge, updateChallenge] = useState<Challenge>(initChallenge);
 
     function handleResponseButtonClicked(article: Article) {
         const correctAnswer = isCorrect(article, challenge.currentWord, challenge.selectedDifficulty);
 
-        setLastAnswerCorrect(() => {
+        setLastAnswer(() => {
             return {
                 wasCorrect: correctAnswer,
                 correctArticle: challenge.expectedArticle,
@@ -45,7 +45,7 @@ function App() {
     }
 
     function resetGame() {
-        setLastAnswerCorrect(initLastAnswer)
+        setLastAnswer(null)
         updateChallenge(c => {
             const challengeWord = chooseNewChallengeWord(c.currentWord, c.selectedDifficulty)
             return {
@@ -94,7 +94,7 @@ function App() {
                 </button>
             </div>
 
-            <LastAnswerDiv lastAnswer={lastAnswerCorrect} />
+            <LastAnswerDiv lastAnswer={lastAnswer} />
 
             <div className="reset-section">
                 <button type="button" className="reset-button" onClick={resetGame}>Zurücksetzen</button>
